@@ -1,0 +1,44 @@
+$ node server.js
+> Ready on http://localhost:3000
+> WebSocket server running with JWT authentication
+Connection attempt without token - allowing as guest
+Client connected: orRbRnZjGYOrTTm6AAAB (guest)
+ ○ Compiling / ...
+ ✓ Compiled / in 8.3s (786 modules)
+ GET / 200 in 8945ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 642ms (501 modules)
+ GET /favicon.ico 200 in 823ms
+ ⚠ Cross origin request detected from car-marketplace-2.lindy.site to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ ○ Compiling /cars ...
+ ✓ Compiled /cars in 2.9s (945 modules)
+ GET /cars 200 in 3172ms
+ GET /cars 200 in 43ms
+ ○ Compiling /trade-in ...
+ ✓ Compiled /trade-in in 1276ms (936 modules)
+ GET /trade-in 200 in 1553ms
+ GET /trade-in 200 in 43ms
+ ○ Compiling /auctions ...
+ ✓ Compiled /auctions in 1000ms (956 modules)
+ GET /auctions 200 in 1245ms
+ GET / 200 in 76ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 1943ms (893 modules)
+ GET /login 200 in 2106ms
+ ○ Compiling /register ...
+ ✓ Compiled /register in 767ms (926 modules)
+ GET /register 200 in 847ms
+ GET / 200 in 58ms
+Client disconnected: orRbRnZjGYOrTTm6AAAB
+ GET / 200 in 955ms
+Connection attempt without token - allowing as guest
+Client connected: D8FGn4fYJFzRySFLAAAD (guest)
+Client disconnected: D8FGn4fYJFzRySFLAAAD
+ GET / 200 in 2836ms
+Connection attempt without token - allowing as guest
+Client connected: YSCzmPen3JJ6wCCRAAAF (guest)
+ GET / 200 in 145ms
+ ○ Compiling /favicon.ico ...
+ ✓ Compiled /favicon.ico in 1676ms (501 modules)
+ GET /favicon.ico 200 in 1895ms
