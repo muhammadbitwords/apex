@@ -154,9 +154,11 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4">
-              <Button className="h-24 flex flex-col gap-2" variant="outline">
-                <Plus className="h-6 w-6" />
-                <span>Add New Listing</span>
+              <Button className="h-24 flex flex-col gap-2" variant="outline" asChild>
+                <Link href="/cars/new">
+                  <Plus className="h-6 w-6" />
+                  <span>Add New Listing</span>
+                </Link>
               </Button>
               <Button className="h-24 flex flex-col gap-2" variant="outline" asChild>
                 <Link href="/auctions">
@@ -185,9 +187,11 @@ export default function DashboardPage() {
               <Car className="h-12 w-12 text-slate-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">No listings yet</h3>
               <p className="text-slate-600 mb-4">Start by adding your first car listing</p>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Your First Car
+              <Button asChild>
+                <Link href="/cars/new">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Your First Car
+                </Link>
               </Button>
             </div>
           </CardContent>

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import React from "react";
+import { useSocket } from "@/lib/socket-context";
 
 const InspectionCard = React.memo(() => (
   <Card className="border-2 hover:border-blue-600 transition-all hover:shadow-lg">
@@ -69,10 +70,17 @@ const TradeInCard = React.memo(() => (
 
 export default function HomePageClient() {
   const router = useRouter();
+  const { isAuthenticated, user } = useSocket();
   const [searchQuery, setSearchQuery] = useState("");
   const [aiParams, setAiParams] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("sessionToken");
+    localStorage.removeItem("jwtToken");
+    router.push("/login");
+  };
   const handleAiSearch = async () => {
     setLoading(true);
     setAiParams(null);
@@ -116,12 +124,33 @@ export default function HomePageClient() {
             <Link href="/inspection" className="text-sm font-medium hover:text-blue-600 transition-colors">Inspection</Link>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild>
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/register">Get Started</Link>
-            </Button>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                {user?.role === "seller" || user?.role === "dealer" ? (
+                  <Button variant="ghost" asChild>
+                    <Link href="/dashboard">Dashboard</Link>
+                  </Button>
+                ) : null}
+                {user?.role === "admin" ? (
+                  <Button variant="ghost" asChild>
+                    <Link href="/admin">Admin Panel</Link>
+                  </Button>
+                ) : null}
+                <span className="text-sm font-medium">Welcome, {user?.name || user?.email}!</span>
+                <Button variant="ghost" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" asChild>
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register">Get Started</Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>

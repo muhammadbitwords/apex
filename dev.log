@@ -1,0 +1,88 @@
+
+> car-marketplace@0.1.0 dev
+> node server.js
+
+> Ready on http://localhost:3000
+> WebSocket server running with JWT authentication
+Connection attempt without token - allowing as guest
+Client connected: k-ZH0HPfDqRgh1MJAAAB (guest)
+ ○ Compiling /cars ...
+ ✓ Compiled /cars in 3.7s (997 modules)
+ ⨯ [Error: Cannot find module 'D:\Personal\FC&BW\apex\apex\.next\server\middleware-manifest.json'
+Require stack:
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\dev\next-dev-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next.js
+- D:\Personal\FC&BW\apex\apex\server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 1193ms (1337 modules)
+ ⨯ [Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+[Error: Cannot find module 'D:\Personal\FC&BW\apex\apex\.next\server\middleware-manifest.json'
+Require stack:
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\dev\next-dev-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next.js
+- D:\Personal\FC&BW\apex\apex\server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+ GET /cars?q=corolla%20in%20sindh&make=Toyota&model=Corolla 500 in 6509ms
+ GET /cars?q=corolla%20in%20sindh&make=Toyota&model=Corolla 500 in 238ms
+ ⨯ [Error: Cannot find module 'D:\Personal\FC&BW\apex\apex\.next\server\middleware-manifest.json'
+Require stack:
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\dev\next-dev-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next.js
+- D:\Personal\FC&BW\apex\apex\server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+[Error: Cannot find module 'D:\Personal\FC&BW\apex\apex\.next\server\middleware-manifest.json'
+Require stack:
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\dev\next-dev-server.js
+- D:\Personal\FC&BW\apex\apex\node_modules\next\dist\server\next.js
+- D:\Personal\FC&BW\apex\apex\server.js] {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [Array]
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'D:\Personal\FC&BW\apex\apex\.next\routes-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'D:\\Personal\\FC&BW\\apex\\apex\\.next\\routes-manifest.json'
+}
+ GET /cars?make=toyota 500 in 502ms
+ GET /cars?make=toyota 500 in 236ms

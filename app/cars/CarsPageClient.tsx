@@ -2,15 +2,19 @@
 
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from "react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Shield, Eye, CreditCard, MapPin } from "lucide-react";
+import { Shield, Eye, CreditCard, MapPin, Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+
+import { MultiSelectFilter } from "@/components/ui/MultiSelectFilter";
 
 // Pakistani car market data
 const mockCars = [
@@ -29,7 +33,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Sedan",
-    engineCC: 1800
+    engineCC: 1800,
+    features: ["sunroof", "leather seats"]
   },
   {
     id: 2,
@@ -46,7 +51,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Sedan",
-    engineCC: 1800
+    engineCC: 1800,
+    features: ["navigation", "alloy wheels"]
   },
   {
     id: 3,
@@ -63,7 +69,8 @@ const mockCars = [
     transmission: "Manual",
     engineType: "Petrol",
     bodyType: "Hatchback",
-    engineCC: 660
+    engineCC: 660,
+    features: ["keyless entry"]
   },
   {
     id: 4,
@@ -80,7 +87,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Diesel",
     bodyType: "SUV",
-    engineCC: 2800
+    engineCC: 2800,
+    features: ["4x4", "sunroof", "leather seats"]
   },
   {
     id: 5,
@@ -97,7 +105,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Sedan",
-    engineCC: 1500
+    engineCC: 1500,
+    features: ["alloy wheels"]
   },
   {
     id: 6,
@@ -114,7 +123,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Hatchback",
-    engineCC: 1000
+    engineCC: 1000,
+    features: []
   },
   {
     id: 7,
@@ -131,7 +141,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Sedan",
-    engineCC: 1500
+    engineCC: 1500,
+    features: ["keyless entry", "alloy wheels"]
   },
   {
     id: 8,
@@ -148,7 +159,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "SUV",
-    engineCC: 1500
+    engineCC: 1500,
+    features: ["7-seater"]
   },
   {
     id: 9,
@@ -165,7 +177,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "Hatchback",
-    engineCC: 1200
+    engineCC: 1200,
+    features: ["navigation"]
   },
   {
     id: 10,
@@ -182,7 +195,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Diesel",
     bodyType: "SUV",
-    engineCC: 2800
+    engineCC: 2800,
+    features: ["4x4", "off-road kit"]
   },
   {
     id: 11,
@@ -199,7 +213,8 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "SUV",
-    engineCC: 2000
+    engineCC: 2000,
+    features: ["sunroof", "panoramic roof"]
   },
   {
     id: 12,
@@ -216,9 +231,12 @@ const mockCars = [
     transmission: "Automatic",
     engineType: "Petrol",
     bodyType: "SUV",
-    engineCC: 2000
+    engineCC: 2000,
+    features: ["leather seats", "ventilated seats"]
   }
 ];
+
+
 
 const CarCard = React.memo(({ car, formatCurrency, handleBuyNow }: { car: any, formatCurrency: any, handleBuyNow: any }) => (
   <Card key={car.id} className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -257,13 +275,20 @@ const CarCard = React.memo(({ car, formatCurrency, handleBuyNow }: { car: any, f
       <div className="pt-4 border-t">
         <p className="text-3xl font-bold text-blue-600">{formatCurrency(car.price)}</p>
       </div>
+      <div className="flex flex-wrap gap-2">
+        {car.features.map((feature: string) => (
+          <Badge key={feature} variant="secondary">{feature}</Badge>
+        ))}
+      </div>
     </CardContent>
 
     <CardFooter className="flex gap-2">
-      <Button variant="outline" className="flex-1">
-        <Eye className="h-4 w-4 mr-2" />
-        View Details
-      </Button>
+      <Link href={`/cars/${car.id}`} className="flex-1">
+        <Button variant="outline" className="w-full">
+          <Eye className="h-4 w-4 mr-2" />
+          View Details
+        </Button>
+      </Link>
       <Button 
         className="flex-1"
         onClick={() => handleBuyNow(car)}
@@ -279,8 +304,8 @@ export default function CarsPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [filters, setFilters] = useState({
-    make: "all",
-    model: "all",
+    make: [],
+    model: [],
     year: "all",
     condition: "all",
     location: "all",
@@ -290,33 +315,42 @@ export default function CarsPageClient() {
     transmission: "all",
     bodyType: "all",
     engineCC: [0, 5000],
-    inspectionScore: 0
+    inspectionScore: 0,
+    features: []
   });
+
+  const [aiSearchApplied, setAiSearchApplied] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const params = Object.fromEntries(searchParams.entries());
+    if (params.q) {
+      setSearchQuery(params.q);
+    }
     if (Object.keys(params).length > 0) {
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        make: params.make || prevFilters.make,
-        model: params.model || prevFilters.model,
-        year: params.year || prevFilters.year,
-        priceRange: [
-          params.minPrice ? parseInt(params.minPrice) : prevFilters.priceRange[0],
-          params.maxPrice ? parseInt(params.maxPrice) : prevFilters.priceRange[1],
-        ],
-        mileageRange: [
-          params.minMileage ? parseInt(params.minMileage) : prevFilters.mileageRange[0],
-          params.maxMileage ? parseInt(params.maxMileage) : prevFilters.mileageRange[1],
-        ],
-        engineCC: [
-          params.minEngineCC ? parseInt(params.minEngineCC) : prevFilters.engineCC[0],
-          params.maxEngineCC ? parseInt(params.maxEngineCC) : prevFilters.engineCC[1],
-        ],
-        transmission: params.transmission || prevFilters.transmission,
-        engineType: params.engineType || prevFilters.engineType,
-        bodyType: params.bodyType || prevFilters.bodyType,
-      }));
+      setAiSearchApplied(true);
+      const newFilters: any = { ...filters };
+      for (const key in params) {
+        if (key === 'make' || key === 'model' || key === 'features') {
+          newFilters[key] = params[key].split(',');
+        } else if (key === 'minPrice') {
+          newFilters.priceRange[0] = parseInt(params[key]);
+        } else if (key === 'maxPrice') {
+          newFilters.priceRange[1] = parseInt(params[key]);
+        } else if (key === 'minMileage') {
+          newFilters.mileageRange[0] = parseInt(params[key]);
+        } else if (key === 'maxMileage') {
+          newFilters.mileageRange[1] = parseInt(params[key]);
+        } else if (key === 'minEngineCC') {
+          newFilters.engineCC[0] = parseInt(params[key]);
+        } else if (key === 'maxEngineCC') {
+          newFilters.engineCC[1] = parseInt(params[key]);
+        } else {
+          newFilters[key] = params[key];
+        }
+      }
+      setFilters(newFilters);
     }
   }, [searchParams]);
 
@@ -344,8 +378,9 @@ export default function CarsPageClient() {
   };
 
   const filteredCars = mockCars.filter(car => {
-    if (filters.make !== "all" && car.make !== filters.make) return false;
-    if (filters.model !== "all" && car.model !== filters.model) return false;
+    if (filters.make.length > 0 && !filters.make.includes(car.make)) return false;
+    if (filters.model.length > 0 && !filters.model.includes(car.model)) return false;
+
     if (filters.year !== "all" && car.year.toString() !== filters.year) return false;
     if (filters.condition !== "all" && car.condition !== filters.condition) return false;
     if (filters.location !== "all" && !car.location.includes(filters.location)) return false;
@@ -356,8 +391,48 @@ export default function CarsPageClient() {
     if (filters.bodyType !== "all" && car.bodyType !== filters.bodyType) return false;
     if (car.engineCC < filters.engineCC[0] || car.engineCC > filters.engineCC[1]) return false;
     if (car.inspectionScore < filters.inspectionScore) return false;
+
+    if (Array.isArray(filters.features) && filters.features.length > 0) {
+      // Assuming car has a features property which is an array of strings
+      const carFeatures = car.features || [];
+      for (const feature of filters.features) {
+        if (!carFeatures.includes(feature)) {
+          return false;
+        }
+      }
+    }
+
     return true;
   });
+  const [aiParams, setAiParams] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAiSearch = async () => {
+    setLoading(true);
+    setAiParams(null);
+    try {
+      const response = await fetch('/api/ai-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const data = await response.json();
+      setAiParams(data);
+    } catch (error) {
+      console.error("Failed to fetch AI search results", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (aiParams) {
+      const query = new URLSearchParams(aiParams).toString();
+      router.push(`/cars?q=${searchQuery}&${query}`);
+    }
+  }, [aiParams, router, searchQuery]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -385,219 +460,281 @@ export default function CarsPageClient() {
           <p className="text-slate-600">Find your perfect vehicle from our verified inventory</p>
         </div>
 
+        {/* Search Bar */}
+        <div className="mb-8">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <Input 
+                placeholder="Search with natural language..." 
+                className="pl-10 h-12 text-base"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button size="lg" className="h-12 px-8" onClick={handleAiSearch} disabled={loading}>
+              {loading ? "Thinking..." : "AI Search"}
+            </Button>
+          </div>
+        </div>
+
           <div className="grid lg:grid-cols-4 gap-6">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
+            {aiSearchApplied && (
+              <Card className="mb-4 bg-blue-50 border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-base">AI Search Applied</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(filters).map(([key, value]) => {
+                      if (value !== 'all' && value !== 0 && (Array.isArray(value) ? value.length > 0 && value[0] !== '' : false)) {
+                        return (
+                          <Badge key={key} variant="secondary">
+                            {key}: {Array.isArray(value) ? value.join(', ') : value}
+                          </Badge>
+                        )
+                      }
+                      return null;
+                    })}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full mt-4 text-blue-600 hover:bg-blue-100"
+                    onClick={() => {
+                      setAiSearchApplied(false);
+                      setFilters({
+                        make: "all",
+                        model: "all",
+                        year: "all",
+                        condition: "all",
+                        location: "all",
+                        priceRange: [0, 30000000],
+                        mileageRange: [0, 200000],
+                        engineType: "all",
+                        transmission: "all",
+                        bodyType: "all",
+                        engineCC: [0, 5000],
+                        inspectionScore: 0,
+                        features: []
+                      });
+                      router.push('/cars');
+                    }}
+                  >
+                    Clear AI Search
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+            <Card className="sticky top-24 border shadow-sm">
               <CardHeader>
                 <CardTitle>Filters</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Make Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Make</label>
-                  <Select value={filters.make} onValueChange={(value) => setFilters({...filters, make: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Makes</SelectItem>
-                      <SelectItem value="Toyota">Toyota</SelectItem>
-                      <SelectItem value="Honda">Honda</SelectItem>
-                      <SelectItem value="Suzuki">Suzuki</SelectItem>
-                      <SelectItem value="Kia">Kia</SelectItem>
-                      <SelectItem value="Hyundai">Hyundai</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Year Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Year</label>
-                  <Select value={filters.year} onValueChange={(value) => setFilters({...filters, year: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Years</SelectItem>
-                      <SelectItem value="2024">2024</SelectItem>
-                      <SelectItem value="2023">2023</SelectItem>
-                      <SelectItem value="2022">2022</SelectItem>
-                      <SelectItem value="2021">2021</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Condition Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Condition</label>
-                  <Select value={filters.condition} onValueChange={(value) => setFilters({...filters, condition: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Conditions</SelectItem>
-                      <SelectItem value="Excellent">Excellent</SelectItem>
-                      <SelectItem value="Very Good">Very Good</SelectItem>
-                      <SelectItem value="Good">Good</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Location Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Location</label>
-                  <Select value={filters.location} onValueChange={(value) => setFilters({...filters, location: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Cities</SelectItem>
-                      <SelectItem value="Karachi">Karachi</SelectItem>
-                      <SelectItem value="Lahore">Lahore</SelectItem>
-                      <SelectItem value="Islamabad">Islamabad</SelectItem>
-                      <SelectItem value="Rawalpindi">Rawalpindi</SelectItem>
-                      <SelectItem value="Faisalabad">Faisalabad</SelectItem>
-                      <SelectItem value="Multan">Multan</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Model Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Model</label>
-                  <Select value={filters.model} onValueChange={(value) => setFilters({...filters, model: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Models</SelectItem>
-                      <SelectItem value="Corolla GLi">Corolla GLi</SelectItem>
-                      <SelectItem value="Civic Oriel">Civic Oriel</SelectItem>
-                      <SelectItem value="Alto VXR">Alto VXR</SelectItem>
-                      <SelectItem value="Fortuner">Fortuner</SelectItem>
-                      <SelectItem value="City Aspire">City Aspire</SelectItem>
-                      <SelectItem value="Cultus VXL">Cultus VXL</SelectItem>
-                      <SelectItem value="Yaris ATIV">Yaris ATIV</SelectItem>
-                      <SelectItem value="BR-V">BR-V</SelectItem>
-                      <SelectItem value="Swift">Swift</SelectItem>
-                      <SelectItem value="Hilux Revo">Hilux Revo</SelectItem>
-                      <SelectItem value="Sportage">Sportage</SelectItem>
-                      <SelectItem value="Tucson">Tucson</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Transmission Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Transmission</label>
-                  <Select value={filters.transmission} onValueChange={(value) => setFilters({...filters, transmission: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Automatic">Automatic</SelectItem>
-                      <SelectItem value="Manual">Manual</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Engine Type Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Engine Type</label>
-                  <Select value={filters.engineType} onValueChange={(value) => setFilters({...filters, engineType: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Petrol">Petrol</SelectItem>
-                      <SelectItem value="Diesel">Diesel</SelectItem>
-                      <SelectItem value="Hybrid">Hybrid</SelectItem>
-                      <SelectItem value="Electric">Electric</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Body Type Filter */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Body Type</label>
-                  <Select value={filters.bodyType} onValueChange={(value) => setFilters({...filters, bodyType: value})}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="Sedan">Sedan</SelectItem>
-                      <SelectItem value="SUV">SUV</SelectItem>
-                      <SelectItem value="Hatchback">Hatchback</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Price Range */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Price Range: {formatCurrency(filters.priceRange[0])} - {formatCurrency(filters.priceRange[1])}
-                  </label>
-                  <Slider
-                    min={0}
-                    max={30000000}
-                    step={500000}
-                    value={filters.priceRange}
-                    onValueChange={(value) => setFilters({...filters, priceRange: value})}
-                  />
-                </div>
-
-                {/* Mileage Range */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Mileage: {filters.mileageRange[0].toLocaleString()} - {filters.mileageRange[1].toLocaleString()} km
-                  </label>
-                  <Slider
-                    min={0}
-                    max={200000}
-                    step={1000}
-                    value={filters.mileageRange}
-                    onValueChange={(value) => setFilters({...filters, mileageRange: value})}
-                  />
-                </div>
-
-                {/* Engine CC */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Engine: {filters.engineCC[0].toLocaleString()} - {filters.engineCC[1].toLocaleString()} CC
-                  </label>
-                  <Slider
-                    min={0}
-                    max={5000}
-                    step={100}
-                    value={filters.engineCC}
-                    onValueChange={(value) => setFilters({...filters, engineCC: value})}
-                  />
-                </div>
-
-                {/* Inspection Score */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Min Inspection Score: {filters.inspectionScore}/200
-                  </label>
-                  <Slider
-                    min={0}
-                    max={200}
-                    step={10}
-                    value={[filters.inspectionScore]}
-                    onValueChange={(value) => setFilters({...filters, inspectionScore: value[0]})}
-                  />
-                </div>
-
+              <CardContent>
+                <Accordion type="multiple" defaultValue={['item-1', 'item-2', 'item-3']}>
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="bg-slate-100 px-4 rounded-t-lg">Vehicle</AccordionTrigger>
+                    <AccordionContent className="px-4 pt-2 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Make</label>
+                        <MultiSelectFilter
+                          options={[
+                            { value: "Toyota", label: "Toyota" },
+                            { value: "Honda", label: "Honda" },
+                            { value: "Suzuki", label: "Suzuki" },
+                            { value: "Kia", label: "Kia" },
+                            { value: "Hyundai", label: "Hyundai" },
+                          ]}
+                          value={filters.make}
+                          onChange={(value) => setFilters({ ...filters, make: value })}
+                          placeholder="Select Makes"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Model</label>
+                        <MultiSelectFilter
+                          options={[
+                            { value: "Corolla GLi", label: "Corolla GLi" },
+                            { value: "Civic Oriel", label: "Civic Oriel" },
+                            { value: "Alto VXR", label: "Alto VXR" },
+                            { value: "Fortuner", label: "Fortuner" },
+                            { value: "City Aspire", label: "City Aspire" },
+                            { value: "Cultus VXL", label: "Cultus VXL" },
+                            { value: "Yaris ATIV", label: "Yaris ATIV" },
+                            { value: "BR-V", label: "BR-V" },
+                            { value: "Swift", label: "Swift" },
+                            { value: "Hilux Revo", label: "Hilux Revo" },
+                            { value: "Sportage", label: "Sportage" },
+                            { value: "Tucson", label: "Tucson" },
+                          ]}
+                          value={filters.model}
+                          onChange={(value) => setFilters({ ...filters, model: value })}
+                          placeholder="Select Models"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Year</label>
+                        <Select value={filters.year} onValueChange={(value) => setFilters({...filters, year: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Years</SelectItem>
+                            <SelectItem value="2024">2024</SelectItem>
+                            <SelectItem value="2023">2023</SelectItem>
+                            <SelectItem value="2022">2022</SelectItem>
+                            <SelectItem value="2021">2021</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Body Type</label>
+                        <Select value={filters.bodyType} onValueChange={(value) => setFilters({...filters, bodyType: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="Sedan">Sedan</SelectItem>
+                            <SelectItem value="SUV">SUV</SelectItem>
+                            <SelectItem value="Hatchback">Hatchback</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger className="bg-slate-100 px-4">Price & Mileage</AccordionTrigger>
+                    <AccordionContent className="px-4 pt-2 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Price Range: {formatCurrency(filters.priceRange[0])} - {formatCurrency(filters.priceRange[1])}
+                        </label>
+                        <Slider
+                          min={0}
+                          max={30000000}
+                          step={500000}
+                          value={filters.priceRange}
+                          onValueChange={(value) => setFilters({...filters, priceRange: value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Mileage: {filters.mileageRange[0].toLocaleString()} - {filters.mileageRange[1].toLocaleString()} km
+                        </label>
+                        <Slider
+                          min={0}
+                          max={200000}
+                          step={1000}
+                          value={filters.mileageRange}
+                          onValueChange={(value) => setFilters({...filters, mileageRange: value})}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-3">
+                    <AccordionTrigger className="bg-slate-100 px-4">Performance</AccordionTrigger>
+                    <AccordionContent className="px-4 pt-2 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Engine Type</label>
+                        <Select value={filters.engineType} onValueChange={(value) => setFilters({...filters, engineType: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="Petrol">Petrol</SelectItem>
+                            <SelectItem value="Diesel">Diesel</SelectItem>
+                            <SelectItem value="Hybrid">Hybrid</SelectItem>
+                            <SelectItem value="Electric">Electric</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Transmission</label>
+                        <Select value={filters.transmission} onValueChange={(value) => setFilters({...filters, transmission: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="Automatic">Automatic</SelectItem>
+                            <SelectItem value="Manual">Manual</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Engine: {filters.engineCC[0].toLocaleString()} - {filters.engineCC[1].toLocaleString()} CC
+                        </label>
+                        <Slider
+                          min={0}
+                          max={5000}
+                          step={100}
+                          value={filters.engineCC}
+                          onValueChange={(value) => setFilters({...filters, engineCC: value})}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-4">
+                    <AccordionTrigger className="bg-slate-100 px-4 rounded-b-lg">Condition & Location</AccordionTrigger>
+                    <AccordionContent className="px-4 pt-2 space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Condition</label>
+                        <Select value={filters.condition} onValueChange={(value) => setFilters({...filters, condition: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Conditions</SelectItem>
+                            <SelectItem value="Excellent">Excellent</SelectItem>
+                            <SelectItem value="Very Good">Very Good</SelectItem>
+                            <SelectItem value="Good">Good</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Location</label>
+                        <Select value={filters.location} onValueChange={(value) => setFilters({...filters, location: value})}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Cities</SelectItem>
+                            <SelectItem value="Karachi">Karachi</SelectItem>
+                            <SelectItem value="Lahore">Lahore</SelectItem>
+                            <SelectItem value="Islamabad">Islamabad</SelectItem>
+                            <SelectItem value="Rawalpindi">Rawalpindi</SelectItem>
+                            <SelectItem value="Faisalabad">Faisalabad</SelectItem>
+                            <SelectItem value="Multan">Multan</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Min Inspection Score: {filters.inspectionScore}/200
+                        </label>
+                        <Slider
+                          min={0}
+                          max={200}
+                          step={10}
+                          value={[filters.inspectionScore]}
+                          onValueChange={(value) => setFilters({...filters, inspectionScore: value[0]})}
+                        />
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </CardContent>
+              <CardFooter>
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full text-lg"
                   onClick={() => setFilters({
-                    make: "all",
-                    model: "all",
+                    make: [],
+                    model: [],
                     year: "all",
                     condition: "all",
                     location: "all",
@@ -607,12 +744,13 @@ export default function CarsPageClient() {
                     transmission: "all",
                     bodyType: "all",
                     engineCC: [0, 5000],
-                    inspectionScore: 0
+                    inspectionScore: 0,
+                    features: []
                   })}
                 >
                   Reset Filters
                 </Button>
-              </CardContent>
+              </CardFooter>
             </Card>
           </div>
 

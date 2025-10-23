@@ -4,7 +4,9 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { generateToken } from "@/lib/jwt";
 
+console.log("DATABASE_URL being used:", process.env.DATABASE_URL);
 const pool = new Pool({
+	 
   connectionString: process.env.DATABASE_URL,
 });
 

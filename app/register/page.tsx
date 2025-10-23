@@ -86,6 +86,7 @@ export default function RegisterPage() {
       } else {
         router.push("/");
       }
+      setLoading(false); // Reset loading state after successful redirection
     } catch (err) {
       setError("An error occurred. Please try again.");
       setLoading(false);
